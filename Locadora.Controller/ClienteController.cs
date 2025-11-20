@@ -73,7 +73,15 @@ namespace Locadora.Controller
                                                 reader["Telefone"].ToString() : null
                                                 );
 
-                    cliente.setClienteID(Convert.ToInt32(reader["ClienteID"]));
+                    //cliente.setClienteID(Convert.ToInt32(reader["ClienteID"]));
+
+                    var documento = new Documento(reader["TipoDocumento"].ToString(),
+                                                  reader["Numero"].ToString(),
+                                                  DateOnly.FromDateTime(reader.GetDateTime(5)),
+                                                  DateOnly.FromDateTime(reader.GetDateTime(6))
+                                                );
+
+                    cliente.setDocumento(documento);
 
                     listaClientes.Add(cliente);
 

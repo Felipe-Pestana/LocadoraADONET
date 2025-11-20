@@ -13,30 +13,30 @@ var clienteController = new ClienteController();
 //documentoController.AdicionarDocumento(documento);
 
 
-try
-{
-    clienteController.AdicionarCliente(cliente, documento);
-}
-catch (Exception ex)
-{
-    Console.WriteLine(ex.Message);
-}
-
 //try
 //{
-
-//    var listadeClientes = clienteController.ListarTodosClientes();
-
-//    foreach (var clientedaLista in listadeClientes)
-//    {
-//        Console.WriteLine(clientedaLista);
-
-//    }
+//    clienteController.AdicionarCliente(cliente, documento);
 //}
 //catch (Exception ex)
 //{
 //    Console.WriteLine(ex.Message);
 //}
+
+try
+{
+
+    var listadeClientes = clienteController.ListarTodosClientes();
+
+    foreach (var clientedaLista in listadeClientes)
+    {
+        Console.WriteLine(clientedaLista);
+
+    }
+}
+catch (Exception ex)
+{
+    Console.WriteLine(ex.Message);
+}
 
 //clienteController.AtualizarTelefoneCliente("99999-9999", "novo@email.com.br");
 //Console.WriteLine(clienteController.BuscaClientePorEmail("novo@email.com.br"));
