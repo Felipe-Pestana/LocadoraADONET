@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Locadora.Models
+﻿namespace Locadora.Models
 {
     public class Veiculo
     {
@@ -16,7 +10,7 @@ namespace Locadora.Models
         public readonly static string SELECTALLVEICULOS = @"SELECT CategoriaID, 
                                                             Placa, Marca, Modelo, Ano, StatusVeiculo
                                                             FROM tblVeiculos";
-        
+
         public readonly static string SELECTVEICULOBYPLACA = @"SELECT VeiculoID, CategoriaID, 
                                                             Placa, Marca, Modelo, Ano, StatusVeiculo
                                                             FROM tblVeiculos

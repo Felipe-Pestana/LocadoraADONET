@@ -1,6 +1,7 @@
 ﻿using Locadora.Controller.Interfaces;
 using Locadora.Models;
 using Microsoft.Data.SqlClient;
+
 using Utils.Databases;
 
 
@@ -47,19 +48,135 @@ namespace Locadora.Controller
             }
         }
 
-        public void AtualizarStatusVeiculo(string statusVeiculo)
+        public void AtualizarStatusVeiculo(string statusVeiculo, string placa)
         {
-            throw new NotImplementedException();
+            Veiculo veiculo = BuscarVeiculoPlaca(placa) ??
+                throw new Exception("Veículo não encontrado para atualizar status.");
+
+            SqlConnection connection = new SqlConnection(ConnectionDB.GetConnectionString());
+            connection.Open();
+
+            using (SqlTransaction transaction = connection.BeginTransaction())
+            {
+                SqlCommand command = new SqlCommand(Veiculo.UPDATESTATUSVEICULO, connection, transaction);
+                try
+                {
+                    command.Parameters.AddWithValue("@StatusVeiculo", statusVeiculo);
+                    command.Parameters.AddWithValue("@IdVeiculo", veiculo.VeiculoID);
+                    
+                    command.ExecuteNonQuery();
+                    
+                    transaction.Commit();
+                }
+                catch (SqlException ex)
+                {
+                    transaction.Rollback();
+                    throw new Exception("Erro ao atualizar status do veículo no banco de dados: " + ex.Message);
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    throw new Exception("Erro ao atualizar status do veículo: " + ex.Message);
+                }
+                finally
+                {
+                    connection.Close();
+                }
+            }
         }
 
         public Veiculo BuscarVeiculoPlaca(string placa)
         {
-            throw new NotImplementedException();
+
+            var categoriaController = new CategoriaController();
+
+            Veiculo veiculo = null;
+
+            SqlConnection connection = new SqlConnection(ConnectionDB.GetConnectionString());
+
+            connection.Open();
+
+            using (SqlCommand command = new SqlCommand(Veiculo.SELECTVEICULOBYPLACA, connection))
+            {
+                try
+                {
+                    command.Parameters.AddWithValue("@Placa", placa);
+
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            veiculo = new Veiculo(
+                                                reader.GetInt32(1),
+                                                reader.GetString(2),
+                                                reader.GetString(3),
+                                                reader.GetString(4),
+                                                reader.GetInt32(5),
+                                                reader.GetString(6)
+                                                );
+
+                            veiculo.setVeiculoID(reader.GetInt32(0));
+
+                            veiculo.setNomeCategoria(
+                                categoriaController.BuscarNomeCategoriaPorId(
+                                    veiculo.CategoriaID)
+                                );
+                        }
+
+                    }
+                }
+                catch (SqlException ex)
+                {
+                    throw new Exception("Erro ao encontrar veículo: " + ex.Message);
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception("Erro ao encontrar veículo: " + ex.Message);
+                }
+                finally
+                {
+                    connection.Close();
+                }
+
+                return veiculo ?? throw new Exception("Veículo não encontrado");
+            }
+
         }
 
         public void DeletarVeiculo(int idVeiculo)
         {
-            throw new NotImplementedException();
+            SqlConnection connection = new SqlConnection(ConnectionDB.GetConnectionString());
+            connection.Open();
+
+
+            using (SqlTransaction transaction = connection.BeginTransaction())
+            {
+                SqlCommand command = new SqlCommand(Veiculo.DELETEVEICULO, connection, transaction);
+                try
+                {
+                    command.Parameters.AddWithValue("@IdVeiculo", idVeiculo);
+
+                    command.ExecuteNonQuery();
+
+                    transaction.Commit();
+                }
+                catch (SqlException ex)
+                {
+                    transaction.Rollback();
+                    throw new Exception("Erro ao deletar veículo do banco de dados: " + ex.Message);
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    throw new Exception("Erro ao deletar veículo: " + ex.Message);
+                }
+                finally
+                {
+                    connection.Close();
+                }
+
+            }
+
         }
 
         public List<Veiculo> ListarTodosVeiculos()
